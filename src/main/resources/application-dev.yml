@@ -6,6 +6,15 @@ spring:
     url: jdbc:mysql://47.98.178.22:3306/auth_demo?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
     username: root
     password: LIN(Q9VrtltlioSdbxfcRm/ULum4YHrjqkcKmpoG+ONHHQS0Cg8iej13nxetzfpQJWdC)
+  # redis
+  redis:
+    host: 47.98.178.22
+    password: LIN(Sff/4fU8ICOWRFpYmQTlouWvb+WqJDwNwv/pbClk7nz9To2nktLmKWu3R8OdpPzb)
+    lettuce:
+      pool:
+        max-active: 100
+        max-idle: 30
+        min-idle: 1
 # mybatis
 mybatis:
   mapper-locations: classpath:mapper/*.xml
