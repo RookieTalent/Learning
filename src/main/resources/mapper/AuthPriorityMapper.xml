@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="run.zykj.app.mapper.AuthPriorityMapper">
+
+    <resultMap id="AuthPriorityPojo" type="run.zykj.app.entity.pojo.AuthPriority">
+        <id property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="url"  column="url"/>
+        <result property="priorityComment"   column="priority_comment"/>
+        <result property="priorityType" column="priority_type"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="gmtCreate"    column="gmt_create"/>
+        <result property="gmtModified"  column="gmt_modified"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, code, url, priority_comment, priority_type, parent_id, gmt_create, gmt_modified
+    </sql>
+
+    <!--新增权限-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into auth_priority(
+            code, url, priority_comment, priority_type, parent_id, gmt_create, gmt_modified
+        ) values(
+            #{code},
+            <if test="url != null and url != ''">#{url},</if>
+            <if test="priorityComment != null and priorityComment != ''">#{priorityComment},</if>
+            #{priorityType},
+            #{parentId},
+            sysdate(),sysdate()
+        )
+    </insert>
+
+    <!--更新权限-->
+    <update id="update">
+        update auth_priority
+        <set>
+            <if test="code != null and code != ''">code=#{code},</if>
+            <if test="url != null and url != ''">url=#{url},</if>
+            <if test="priorityComment != null and priorityComment != ''">priority_comment=#{priorityComment},</if>
+            <if test="priorityType != null">priority_type=#{priorityType},</if>
+            <if test="parentId != null">parent_id=#{parentId},</if>
+            gmt_modified=sysdate()
+        </set>
+        where id=#{id}
+    </update>
+
+    <!--删除权限-->
+    <delete id="delete">
+      delete p, arpr, aapr from
+            auth_priority as p
+      inner join auth_role_priority_relationship as arpr on arpr.priority_id = p.id
+      inner join auth_account_priority_relationship as aapr on aapr.priority_id = p.id
+      where p.id=#{priorityId}
+    </delete>
+
+    <!--查询系统权限列表-->
+    <select id="selectPriorityList" resultMap="AuthPriorityPojo">
+        select <include refid="Base_Column_List"></include>
+        from auth_priority
+    </select>
+
+    <!-- TODO 查询用户所需要的权限列表 有BUG-->
+    <select id="selectPriorityListByUserId" resultMap="AuthPriorityPojo">
+        select ap.id, ap.code, ap.url, ap.priority_comment, ap.priority_type, ap.parent_id, ap.gmt_create, ap.gmt_modified
+        from auth_priority as ap
+        left join auth_role_priority_relationship as arpr on arpr.priority_id = ap.id
+        left join auth_account_role_relationship as aarr on aarr.role_id = arpr.role_id
+        left join auth_role as ar on ar.id = aarr.role_id
+        left join auth_account as aa on aa.id = aarr.account_id
+        where aa.id=#{accountId} and ap.priority_type in (1, 2)
+        order by ap.parent_id
+    </select>
+
+    <!--根据id判断是否有子节点-->
+    <select id="hasChild" resultType="java.lang.Boolean">
+        select count(1)
+        from auth_priority
+        where parent_id=#{priorityId}
+    </select>
+
+    <!--根据id查询返回结果-->
+    <select id="selectById" resultMap="AuthPriorityPojo">
+        select <include refid="Base_Column_List"></include>
+        from auth_priority
+        where id=#{priorityId}
+    </select>
+
+    <!--查询父级节点是parentId的节点-->
+    <select id="selectByParentId" resultMap="AuthPriorityPojo">
+        select <include refid="Base_Column_List"></include>
+        from auth_priority
+        where parent_id=#{parentId}
+    </select>
+
+    <!--校验权限参数的唯一性-->
+    <select id="checkPriorityUnquie" resultMap="AuthPriorityPojo">
+        select <include refid="Base_Column_List"></include>
+        from auth_priority
+        where code=#{code} and priority_comment=#{priorityComment} and parent_id=#{parentId} limit 1
+    </select>
+
+
+</mapper>
