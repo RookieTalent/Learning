@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="run.zykj.app.subject7.mapper.UserLikeArticleMapper">
+
+    <resultMap id="UserLikeArticle" type="run.zykj.app.subject7.entity.UserLikeArticle">
+        <id property="userId" column="user_id"/>
+        <id property="articleId" column="article_id"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        user_id, article_id
+    </sql>
+
+</mapper>

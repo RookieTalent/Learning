@@ -8,36 +8,39 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
+import run.zykj.app.subject14.service.MailService;
+import run.zykj.app.subject22.entity.MusicTable;
+import run.zykj.app.subject22.mapper.MusicTableMapper;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 class AuthdemoApplicationTests {
 
-    @Value("${spring.datasource.password}")
-    private String password;
-
-    @Value("${spring.redis.password}")
-    private String redisPassword;
+    private final static String MUSIC_RANK = "music_rank";
+    private final static Integer limit = 3;
 
     @Autowired
-    private StringEncryptor demoStringEncryptor;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private MailService mailService;
+
+    @Autowired
+    private MusicTableMapper musicTableMapper;
 
     @Test
     void test1(){
-        String encrypt = demoStringEncryptor.encrypt(password);
-        System.out.println("encrypt = " + encrypt);
+        Set<Object> range = redisTemplate.opsForZSet().range(MUSIC_RANK, 0, 3);
+        for (Object o : range) {
+            System.out.println("o = " + o);
+        }
     }
 
     @Test
     void test2(){
-        String obj = (String) redisTemplate.opsForValue().get("sys_config:sys.index.skinName");
-
-        System.out.println("obj.length() = " + obj.length());
     }
 }

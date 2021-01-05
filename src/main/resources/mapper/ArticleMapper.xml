@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="run.zykj.app.subject7.mapper.ArticleMapper">
+
+    <resultMap id="Article" type="run.zykj.app.subject7.entity.Article">
+        <id property="id" column="id"/>
+        <result property="articleName" column="article_name"/>
+        <result property="content" column="content"/>
+        <result property="totalLikeCount" column="total_like_count"/>
+        <result property="gmtCreate" column="gmt_create"/>
+        <result property="gmtModified" column="gmt_modified"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, article_name, content, total_like_count, gmt_create, gmt_modified
+    </sql>
+
+    <!--根据id判断文章是否存在-->
+    <select id="findArtcileIsNotNull" resultType="java.lang.Integer">
+        select count(1)
+        from article where id=#{articleId}
+    </select>
+
+</mapper>

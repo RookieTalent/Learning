@@ -1,11 +1,30 @@
 # 数据库
 spring:
   datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
+#    type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://47.98.178.22:3306/auth_demo?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
     username: root
     password: LIN(Q9VrtltlioSdbxfcRm/ULum4YHrjqkcKmpoG+ONHHQS0Cg8iej13nxetzfpQJWdC)
+    # 连接池
+    druid:
+      initial-size: 5               # 初始连接数
+      max-active: 20                # 最大活跃数
+      min-idle: 5                   # 最小活跃数
+      max-wait: 60000               # 等待超时时间
+      # 打开PSCache 并设置大小
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      validation-query: SELECT 1 FROM DUAL
+      validation-query-timeout: 30000
+      test-on-borrow: false         # 检测连接后可用性
+      test-on-return: false         # 检测放回后可用性
+      test-while-idle: false        # 检测空闲可用性
+      time-between-eviction-runs-millis: 60000      # 检测需要关闭的空闲连接，单位是毫秒
+      min-evictable-idle-time-millis: 300000        # 配置一个连接在池中最小生存的时间，单位是毫秒
+      stat-view-servlet:
+        login-username: admin
+        login-password: admin
   # redis
   redis:
     host: 47.98.178.22
@@ -15,6 +34,19 @@ spring:
         max-active: 100
         max-idle: 30
         min-idle: 1
+    database: 1
+  # mail
+  mail:
+    host: smtp.qq.com       # 发送邮件服务器
+    username: 2544472820@qq.com   # 发送邮件的邮箱地址
+    password: LIN(3N+rQeyvFw/SphRdTl9NR9muQf3hLBRJylAmsKy+1A0GG+8CiLv+ZJGwm6cXfai6sCFGEy6EvkZRuu+H3ifTTg==)  # 客户端授权码
+    properties.mail.smtp.port: 465 #端口号465或587
+    from: 2544472820@qq.com
+    # 其他配置
+    properties.mail.smtp.starttls.enable: true
+    properties.mail.smtp.starttls.required: true
+    properties.mail.smtp.ssl.enable: true
+    default-encoding: utf-8
 # mybatis
 mybatis:
   mapper-locations: classpath:mapper/*.xml
@@ -29,3 +61,7 @@ jasypt:
       prefix: LIN(
       suffix: )
     bean: demoStringEncryptor
+# mq
+rocketmq:
+  nameServer:
+    offline: 47.98.178.22:9876
