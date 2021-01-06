@@ -8,6 +8,7 @@ import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.common.message.Message;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,10 +16,14 @@ import run.zykj.app.subject14.entity.EmailUser;
 import run.zykj.app.subject14.entity.dto.RegisterInfo;
 import run.zykj.app.subject14.mapper.EmailUserMapper;
 import run.zykj.app.subject14.mq.constants.MessageProtocolConst;
+import run.zykj.app.subject14.mq.listener.RegisterListener;
 import run.zykj.app.subject14.mq.producer.RegisterProducer;
 import run.zykj.app.subject14.mq.protocol.RegisterProtcol;
 import run.zykj.app.subject14.service.UserService;
 import run.zykj.app.utils.CGlibUtils;
+
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author lingSong
@@ -39,6 +44,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RegisterProducer registerProducer;
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void register(@NotNull RegisterInfo info) {
@@ -57,13 +65,43 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * TODO 存在BUG 激活失败之后呢？ 是不是应该重新发送一份呢？
+     * @param code
+     * @param userId
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public void activationUser(String code, Long userId) {
+        EmailUser user = findByIdOfNonNull(userId);
+
+        // 对比
+        Map<Object, Object> map = redisTemplate.opsForHash().entries(RegisterListener.EMAIL_ACTIVE + user.getEmail());
+        String mapId = (String) map.get("userId");
+        String mapCode = (String) map.get("code");
+
+        if(mapId.equals(String.valueOf(userId)) && mapCode.equals(code)){
+            mapper.activationUser(userId);
+        }else {
+            throw new RuntimeException("操作失败， 激活失败!");
+        }
+    }
+
+    @Override
+    public EmailUser findByIdOfNonNull(Long userId) {
+        return Optional.ofNullable(mapper.findById(userId)).orElseThrow(
+                () -> new RuntimeException("The userId does not exist")
+        );
+    }
+
+
+    /**
      * 发送邮件入队
      *
      * @param user
      */
     private void sendEmailEnqueue(EmailUser user){
         RegisterProtcol msgProtcol = new RegisterProtcol();
-        msgProtcol.setUserId(user.getId()).setEmail(user.getEmail());
+        msgProtcol.setUserId(String.valueOf(user.getId())).setEmail(user.getEmail());
         String msgBody = msgProtcol.encode();
         log.info("发送邮件消息入队， 消息协议={}",  msgBody);
 

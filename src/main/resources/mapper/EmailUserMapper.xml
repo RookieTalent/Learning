@@ -14,15 +14,20 @@
     </sql>
 
     <!--新增一条数据-->
-    <insert id="insert">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         insert into email_user(
             <if test="name != null and name != ''">`name`, </if>
-            <if test="email != null and email != ''">email, </if>
+            <if test="email != null and email != ''">email </if>
         ) values (
             <if test="name != null and name != ''">#{name}, </if>
             <if test="email != null and email != ''">#{email}</if>
         )
     </insert>
+
+    <!--激活用户-->
+    <update id="activationUser">
+        update email_user set status='active'  where id=#{userId}
+    </update>
 
     <!--检测用户名在数据库中的唯一性-->
     <select id="checkNameUnique" resultType="java.lang.Integer">
@@ -32,6 +37,13 @@
     <!--检测邮箱在数据库中的唯一性-->
     <select id="checkEmailUnique" resultType="java.lang.Integer">
         select count(*) from email_user where email=#{email}
+    </select>
+
+    <!--根据id查询用户-->
+    <select id="findById" resultMap="EmailUser">
+        select <include refid="Base_Column_List"></include>
+        from email_user
+        where id=#{userId}
     </select>
 
 

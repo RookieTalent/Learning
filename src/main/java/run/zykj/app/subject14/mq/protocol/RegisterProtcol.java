@@ -22,7 +22,7 @@ import java.util.Map;
 public class RegisterProtcol extends BaseMsg implements Serializable {
 
     // 用户id
-    private Long userId;
+    private String userId;
 
     // 用户邮箱
     private String email;
@@ -72,7 +72,7 @@ public class RegisterProtcol extends BaseMsg implements Serializable {
             this.setVersion(root.get("header").get("version").asText());
             this.setTopicName(root.get("header").get("topicName").asText());
             //body
-            this.setUserId(Long.getLong(root.get("body").get("userId").asText()));
+            this.setUserId(root.get("body").get("userId").asText());
             this.setEmail(root.get("body").get("email").asText());
         }catch (Exception e){
             log.error("RegisterProtocol消息反序列化json异常:{}", e);
@@ -80,7 +80,7 @@ public class RegisterProtcol extends BaseMsg implements Serializable {
         }
     }
 
-    public RegisterProtcol setUserId(Long userId) {
+    public RegisterProtcol setUserId(String userId) {
         this.userId = userId;
         return this;
     }
@@ -91,7 +91,7 @@ public class RegisterProtcol extends BaseMsg implements Serializable {
         return this;
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 

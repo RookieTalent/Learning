@@ -64,4 +64,4 @@ jasypt:
 # mq
 rocketmq:
   nameServer:
-    offline: 47.98.178.22:9876
+    offline: 192.168.62.110:9876

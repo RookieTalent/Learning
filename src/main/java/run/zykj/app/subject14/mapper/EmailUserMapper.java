@@ -32,4 +32,19 @@ public interface EmailUserMapper {
      * @param user
      */
     void insert(EmailUser user);
+
+    /**
+     * 根据id查询用户
+     *
+     * @param userId
+     * @return
+     */
+    EmailUser findById(Long userId);
+
+    /**
+     * 激活用户
+     *
+     * @param userId
+     */
+    void activationUser(Long userId);
 }

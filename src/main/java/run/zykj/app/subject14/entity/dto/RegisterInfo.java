@@ -8,8 +8,6 @@ import lombok.Data;
  */
 @Data
 public class RegisterInfo {
-    private Long id;
     private String name;
     private String email;
-    private String status;
 }

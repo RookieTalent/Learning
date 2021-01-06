@@ -30,8 +30,10 @@ public class RedisConfig {
         serializer.setObjectMapper(mapper);
 
         redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashValueSerializer(serializer);
         // 使用StringRedisSerializer来序列化和反序列化redis的key值
         redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         redisTemplate.afterPropertiesSet();
 
         return redisTemplate;
