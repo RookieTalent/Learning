@@ -32,7 +32,9 @@ PX millsecond: 设置过期时间， 过期时间精确为毫秒
 __完成__  
 
 3. 博客的发布与查看  
-?
+mset，mget，msetnx，m -> multi的意思，mset一下子设置多个key-value对，mget就是一下子获取多个key的value，msetnx就是在多个key都不存在的情况下，一次性设置多个key的value
+mset和mget，相当于是batch批量设置和查询
+__完成__
 
 4. 博客字数统计与文章预览  
 解： 原生API： STRLEN key  
@@ -40,7 +42,11 @@ Java代码实现场景，如果只是字符串，直接根据key拿到string取l
 __完成__  
 
 5. 用户操作日志审计功能
-?
+思路：string字符串的命令 `APPEND KEY_NAME NEW_VALUE`  
+用于为指定的 key 追加值。
+如果 key 已经存在并且是一个字符串， APPEND 命令将 value 追加到 key 原来的值的末尾。
+如果 key 不存在， APPEND 就简单地将给定 key 设为 value ，就像执行 SET key value 一样。
+__完成__
 
 6. 实现一个简单的唯一id生成器
 解：原生API 就是调用incr 命令  
@@ -111,6 +117,8 @@ java代码实现场景： 直接实现取出就是.size()罢了
 __完成__ 
 
 16. 博客网站的文章标签管理  
+思路： 标签不能重复  set数据结构  
+__完成__
 
 17. 朋友圈点赞功能的实现  
 同7
@@ -145,7 +153,7 @@ __简易版本完成__
 __这个简易版也很简单， 就是两次sadd操作，分清什么对象往什么集合内插入就可以了__
 
 21. 为商品搜索构建反向索引
-思路： 反向索引 = 倒排索引 难点反而在中文分词  词义分析上  
+思路： 反向索引 = 倒排索引 难点反而在 __中文分词词义分析上__  
 ID1：梅林红烧肉罐头
 ID2：梅林番茄炖肉罐头
 
@@ -193,6 +201,18 @@ __完成__
 26. 基于hyperloglog的网站uv统计
 思路： HyperLogLog 目前只支持3个命令，PFADD、PFCOUNT、PFMERGE  不过我在Redistemplate上没用过  
 HyperLogLog是可以合并的， __这个麻烦在理解合并上吧__
+原生API： 
+```java
+pfadd uv1-7 ip地址
+pfadd uv1-8 ip地址
+pfadd uv1-9 ip地址
+# 合并
+pfmerge aganuv uv1-7 uv1-8 uv1-9
+# 计数
+pfcount aganuv
+```
+java代码实现就是一句： `this.redisTemplate.opsForHyperLogLog().add(Constants.PV_KEY,ip);`
+__完成__
 
 27. 网站重复垃圾数据的快速去重和过滤
 又一个布隆过滤器？
@@ -201,16 +221,32 @@ HyperLogLog是可以合并的， __这个麻烦在理解合并上吧__
 思路： 这个是位图
 
 29. 基于位图的网站用户行为记录程序
+思路：以用户id为key，然后以日期或者日期的偏移量作为下标，将登录状态存储到对应的比特位中，这样就可以很方便地获取用户某一天的登录状态  
+__完成__
 
 30. 基于geohash 你与商铺距离计算的程序
 思路： Redis GEO  
+1、GEOADD：增加某个地理位置的坐标            *
+2、GEOPOS：获取某个地理位置的坐标            *
+3、GEODIST：获取两个地理位置的距离           *
+4、georadius：根据用户给定的经纬度坐标来获取指定范围内的地理位置集合
+5、georadiusbymember：根据储存在位置集合里面的某个地点获取指定范围内的地理位置集合
+6、GEOHASH：获取某个地理位置的 geohash 值
+
 
 31. 陌生人社交app里查找附近的人功能
 思路： Redis GEO  
+1、GEOADD：增加某个地理位置的坐标            *
+2、GEOPOS：获取某个地理位置的坐标            *
+3、GEODIST：获取两个地理位置的距离           *
+4、georadius：根据用户给定的经纬度坐标来获取指定范围内的地理位置集合                 *  
+5、georadiusbymember：根据储存在位置集合里面的某个地点获取指定范围内的地理位置集合    *  
+
 
 --------------------------------------------------
 
 32. 带有自动过期时间的分布式缓存实现
+思路： 
 
 33. 支持超时自动释放的分布式缓存时间
 
